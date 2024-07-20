@@ -4,8 +4,6 @@ version: 0.2
 
 phases:
   install:
-    runtime-versions:
-      php: 7.4
     commands:
       - echo "Installing dependencies..."
       - apt-get update -y
