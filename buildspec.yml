@@ -10,26 +10,21 @@ phases:
       - mv composer.phar /usr/local/bin/composer
   pre_build:
     commands:
-      - echo Starting the Docker daemon...
-      - nohup /usr/local/bin/dockerd-entrypoint.sh > /var/log/dockerd.log 2>&1 &
-      - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
-      - echo Retrieving Docker credentials from SSM...
-      - export DOCKER_USERNAME=$(aws ssm get-parameter --name "/myapp/docker_credentials/username" --with-decryption --query "Parameter.Value" --output text)
-      - export DOCKER_PASSWORD=$(aws ssm get-parameter --name "/myapp/docker_credentials/password" --with-decryption --query "Parameter.Value" --output text)
-      - echo Logging in to Docker Hub...
-      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - echo "Logging in to Docker Hub..."
+      - echo Jitendra222@ | docker login -u jitendra222 --password-stdin docker.io
   build:
     commands:
-      - echo Building the Docker image...
+      - echo "Building the Docker image..."
       - docker build -t jitendra222/laravel-app:latest .
+      - echo "Pushing the Docker image..."
+      - docker push jitendra222/laravel-app:latest
   post_build:
     commands:
-      - echo Pushing the Docker image to Docker Hub...
-      - docker push jitendra222/laravel-app:latest
+      - echo "Build completed on `date`"
 artifacts:
   files:
     - '**/*'
 
-
-
-
+cache:
+  paths:
+    - /root/.composer/cache
