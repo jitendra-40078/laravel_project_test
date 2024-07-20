@@ -1,0 +1,39 @@
+version: 0.2
+
+env:
+  parameter-store:
+    DOCKER_REGISTRY_USERNAME: /myapp/docker-credentials/username
+    DOCKER_REGISTRY_PASSWORD: /myapp/docker-credentials/password
+
+phases:
+  install:
+    runtime-versions:
+      php: 7.4
+      docker: 19
+    commands:
+      - echo "Installing dependencies..."
+      - apt-get update -y
+      - apt-get install -y unzip
+      - curl -sS https://getcomposer.org/installer | php
+      - mv composer.phar /usr/local/bin/composer
+  pre_build:
+    commands:
+      - echo "Logging in to Docker Hub..."
+      - echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
+  build:
+    commands:
+      - echo "Building the Docker image..."
+      - docker build -t $DOCKERHUB_USERNAME/laravel-app:$CODEBUILD_RESOLVED_SOURCE_VERSION .
+      - echo "Pushing the Docker image..."
+      - docker push $DOCKERHUB_USERNAME/laravel-app:$CODEBUILD_RESOLVED_SOURCE_VERSION
+  post_build:
+    commands:
+      - echo "Build completed on `date`"
+artifacts:
+  files:
+    - appspec.yml
+    - scripts/*
+
+cache:
+  paths:
+    - /root/.composer/cache
