@@ -2,6 +2,8 @@ version: 0.2
 
 phases:
   install:
+    runtime-versions:
+      docker: 19
     commands:
       - echo "Installing dependencies..."
       - apt-get update -y
@@ -10,11 +12,14 @@ phases:
       - mv composer.phar /usr/local/bin/composer
   pre_build:
     commands:
+      - echo Starting the Docker daemon...
+      - nohup /usr/local/bin/dockerd-entrypoint.sh > /var/log/dockerd.log 2>&1 &
+      - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
       - echo Retrieving Docker credentials from SSM...
-      - export DOCKER_USERNAME=$(aws ssm get-parameter --name "/myapp/docker_cresentials/username" --with-decryption --query "Parameter.Value" --output text)
+      - export DOCKER_USERNAME=$(aws ssm get-parameter --name "/myapp/docker_credentials/username" --with-decryption --query "Parameter.Value" --output text)
       - export DOCKER_PASSWORD=$(aws ssm get-parameter --name "/myapp/docker_credentials/password" --with-decryption --query "Parameter.Value" --output text)
       - echo Logging in to Docker Hub...
-      - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin docker.io
+      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   build:
     commands:
       - echo Building the Docker image...
