@@ -2,30 +2,30 @@ version: 0.2
 
 phases:
   install:
+    runtime-versions:
+      php: 7.4
+      docker: 19
     commands:
-      - echo "Installing dependencies..."
-      - apt-get update -y
-      - apt-get install -y unzip
-      - curl -sS https://getcomposer.org/installer | php
-      - mv composer.phar /usr/local/bin/composer
+      - echo Installing dependencies...
+      - apt-get update
+      - apt-get install -y awscli
   pre_build:
     commands:
-      - echo "Logging in to Docker Hub..."
-      - echo Jitendra222@ | docker login -u jitendra222 --password-stdin docker.io
+      - echo Retrieving Docker credentials from SSM...
+      - export DOCKER_USERNAME=$(aws ssm get-parameter --name "/myapp/docker_cresentials/username" --with-decryption --query "Parameter.Value" --output text)
+      - export DOCKER_PASSWORD=$(aws ssm get-parameter --name "/myapp/docker_credentials/password" --with-decryption --query "Parameter.Value" --output text)
+      - echo Logging in to Docker Hub...
+      - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
   build:
     commands:
-      - echo "Building the Docker image..."
-      - docker build -t jitendra222/laravel-app:latest .
-      - echo "Pushing the Docker image..."
-      - docker push jitendra222/laravel-app:latest
+      - echo Building the Docker image...
+      - docker build -t your-dockerhub-username/laravel-app:latest .
   post_build:
     commands:
-      - echo "Build completed on `date`"
+      - echo Pushing the Docker image to Docker Hub...
+      - docker push your-dockerhub-username/laravel-app:latest
 artifacts:
   files:
     - '**/*'
 
-cache:
-  paths:
-    - /root/.composer/cache
 
