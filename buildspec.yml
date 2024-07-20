@@ -18,11 +18,11 @@ phases:
   build:
     commands:
       - echo Building the Docker image...
-      - docker build -t DOCKER_PASSWORD/laravel-app:latest .
+      - docker build -t jitendra222/laravel-app:latest .
   post_build:
     commands:
       - echo Pushing the Docker image to Docker Hub...
-      - docker push DOCKER_USERNAME/laravel-app:latest
+      - docker push jitendra222/laravel-app:latest
 artifacts:
   files:
     - '**/*'
