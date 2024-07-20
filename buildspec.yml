@@ -14,7 +14,7 @@ phases:
       - export DOCKER_USERNAME=$(aws ssm get-parameter --name "/myapp/docker_cresentials/username" --with-decryption --query "Parameter.Value" --output text)
       - export DOCKER_PASSWORD=$(aws ssm get-parameter --name "/myapp/docker_credentials/password" --with-decryption --query "Parameter.Value" --output text)
       - echo Logging in to Docker Hub...
-      - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+      - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin docker.io
   build:
     commands:
       - echo Building the Docker image...
