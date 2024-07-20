@@ -6,7 +6,6 @@ phases:
   install:
     runtime-versions:
       php: 7.4
-      docker: 19
     commands:
       - echo "Installing dependencies..."
       - apt-get update -y
