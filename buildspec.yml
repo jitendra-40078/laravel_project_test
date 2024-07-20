@@ -13,12 +13,12 @@ phases:
   pre_build:
     commands:
       - echo "Logging in to Docker Hub..."
-      - echo Jitendra222 | docker login -u jitendra222 --password-stdin docker.io
+      - echo Jitendra222@ | docker login -u jitendra222 --password-stdin docker.io
   build:
     commands:
       - echo "Building the Docker image..."
       #- echo "$DOCKER_REGISTRY_PASSWORD" | docker login -u "$DOCKER_REGISTRY_USERNAME" --password-stdin docker.io
-      - docker build -t Jitendra222/laravel-app:latest .
+      - docker build -t Jitendra222@/laravel-app:latest .
       - echo "Pushing the Docker image..."
       - docker push jitendra222/laravel-app:latest
   post_build:
