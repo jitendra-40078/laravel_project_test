@@ -1,9 +1,6 @@
 version: 0.2
 
-env:
-  parameter-store:
-    DOCKER_REGISTRY_USERNAME: /myapp/docker-credentials/username
-    DOCKER_REGISTRY_PASSWORD: /myapp/docker-credentials/password
+
 
 phases:
   install:
@@ -19,13 +16,14 @@ phases:
   pre_build:
     commands:
       - echo "Logging in to Docker Hub..."
-      - echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
+      - echo Jitendra222@ | docker login -u jitendra222 --password-stdin docker.io
   build:
     commands:
       - echo "Building the Docker image..."
-      - docker build -t $DOCKERHUB_USERNAME/laravel-app:$CODEBUILD_RESOLVED_SOURCE_VERSION .
+      #- echo "$DOCKER_REGISTRY_PASSWORD" | docker login -u "$DOCKER_REGISTRY_USERNAME" --password-stdin docker.io
+      - docker build -t Jitendra222@/laravel-app:latest .
       - echo "Pushing the Docker image..."
-      - docker push $DOCKERHUB_USERNAME/laravel-app:$CODEBUILD_RESOLVED_SOURCE_VERSION
+      - docker push jitendra222/laravel-app:latest
   post_build:
     commands:
       - echo "Build completed on `date`"
