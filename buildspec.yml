@@ -1,30 +1,40 @@
 version: 0.2
 
+env:
+  variables:
+    DOCKERHUB_USERNAME: "/dockerhub/username"
+    DOCKERHUB_PASSWORD: "/dockerhub/password"
+    IMAGE_REPO_NAME: "your_dockerhub_repo_name"
+  parameter-store:
+    DB_HOST: "/laravel/db_host"
+    DB_DATABASE: "/laravel/db_database"
+    DB_USERNAME: "/laravel/db_username"
+    DB_PASSWORD: "/laravel/db_password"
+
 phases:
   install:
+    runtime-versions:
+      docker: 19
     commands:
-      - echo "Installing dependencies..."
-      - apt-get update -y
-      - apt-get install -y unzip
-      - curl -sS https://getcomposer.org/installer | php
-      - mv composer.phar /usr/local/bin/composer
+      - echo Logging in to Amazon ECR...
+      - echo $DOCKERHUB_PASSWORD | docker login --username $DOCKERHUB_USERNAME --password-stdin
   pre_build:
     commands:
-      - echo "Logging in to Docker Hub..."
-      - echo Jitendra222@ | docker login -u jitendra222 --password-stdin docker.io
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - docker build -t $IMAGE_REPO_NAME .
   build:
     commands:
-      - echo "Building the Docker image..."
-      - docker build -t jitendra222/laravel-app:latest .
-      - echo "Pushing the Docker image..."
-      - docker push jitendra222/laravel-app:latest
+      - echo Build completed on `date`
+      - echo Tagging the Docker image...
+      - docker tag $IMAGE_REPO_NAME:latest $DOCKERHUB_USERNAME/$IMAGE_REPO_NAME:latest
   post_build:
     commands:
-      - echo "Build completed on `date`"
+      - echo Pushing the Docker image...
+      - docker push $DOCKERHUB_USERNAME/$IMAGE_REPO_NAME:latest
 artifacts:
   files:
     - '**/*'
+  discard-paths: yes
 
-cache:
-  paths:
-    - /root/.composer/cache
+
